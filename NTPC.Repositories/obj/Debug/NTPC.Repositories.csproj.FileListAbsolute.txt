@@ -1,0 +1,10 @@
+E:\Project\NTPC\NTPC.Repositories\bin\Debug\NTPC.Repositories.dll
+E:\Project\NTPC\NTPC.Repositories\bin\Debug\NTPC.Repositories.pdb
+E:\Project\NTPC\NTPC.Repositories\bin\Debug\MySql.Data.dll
+E:\Project\NTPC\NTPC.Repositories\bin\Debug\NTPC.DAL.dll
+E:\Project\NTPC\NTPC.Repositories\bin\Debug\NTPC.Models.dll
+E:\Project\NTPC\NTPC.Repositories\bin\Debug\NTPC.DAL.pdb
+E:\Project\NTPC\NTPC.Repositories\bin\Debug\NTPC.Models.pdb
+E:\Project\NTPC\NTPC.Repositories\obj\Debug\NTPC.Repositories.csprojResolveAssemblyReference.cache
+E:\Project\NTPC\NTPC.Repositories\obj\Debug\NTPC.Repositories.dll
+E:\Project\NTPC\NTPC.Repositories\obj\Debug\NTPC.Repositories.pdb

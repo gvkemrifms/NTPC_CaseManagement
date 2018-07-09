@@ -1,0 +1,864 @@
+﻿@{
+    ViewBag.Title = "CreateNewCase";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model NTPC.Models.NewCaseVM
+
+<style>
+    .validationError {
+        color: red;
+        font-style: italic;
+        font-weight: inherit;
+    }
+
+    .item {
+        padding-right: 1px;
+    }
+</style>
+<div class="panel panel-info" style="margin-top:10px">
+    <div class="panel-heading">
+        <label id="lblCallId">Call Id: @Model.CallId</label>
+        <label class="pull-right" style="text-align:right" id="lblCallTime"> Call Time: @Model.CallTime </label>
+    </div>
+</div>
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <label id="lblVehicleId" hidden>@Model.VehicleId</label>
+        <label id="lblVehicleNumber">Vehicle No: @Model.VehicleNumber</label>
+        @if (!Model.IsEditMode)
+        {
+            <label class="pull-right" style="text-align:right" id="lblVehicleLocation"> Location:@Model.VehicleLocation </label>
+        }
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        Caller Details
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Call Type:</label>
+                    <div class="col-sm-8">
+                        @if (Model.IsEditMode)
+                        {
+                            @Html.DropDownListFor(m => m.SelectedCallType, Model.CallTypes, "Select Call Type", new { @class = "form-control", autofocus = "autofocus", id = "ddlCallType", disabled = "true" })
+                        }
+                        else
+                        {
+                            @Html.DropDownListFor(m => m.SelectedCallType, Model.CallTypes, "Select Call Type", new { @class = "form-control", autofocus = "autofocus", id = "ddlCallType" })
+                        }
+                        <label class="validationError" id="valDdlCallType" hidden="hidden"> </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Caller Name:</label>
+                    <div class="col-sm-8">
+                        @if (Model.IsEditMode)
+                        {
+                            <input type="text" class="form-control" id="txtCallerName" placeholder="Enter caller name" onkeyup="clearError(this)" disabled="disabled" value="@Model.CaseDetails.CallerName">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="txtCallerName" placeholder="Enter caller name" onkeyup="clearError(this)">
+                        }
+                        <label class="validationError" id="valTxtCallName" hidden="hidden"> </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Contact No:</label>
+                    <div class="col-sm-8">
+                        @if (Model.IsEditMode)
+                        {
+                            <input type="text" class="form-control" id="txtContactNumber" placeholder="Enter Caller Contact Number" onkeypress="return isNumberKey(this)" disabled="disabled" value="@Model.CaseDetails.ContactNumber" onkeyup="clearError(this)">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="txtContactNumber" placeholder="Enter Caller Contact Number" onkeypress="return isNumberKey(this)" onkeyup="clearError(this)">
+                        }
+                        <label class="validationError" id="valContactNumber" hidden="hidden"> </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-4">Incident Location:</label>
+                    <div class="col-sm-8">
+                        @if (Model.IsEditMode)
+                        {
+                            @Html.TextAreaFor(m => m.CaseDetails.IncidentLocation, new { @class = "form-control", id = "txtIncidentLocation", disabled = "true" })
+                        }
+                        else
+                        {
+                            <textarea class="form-control" id="txtIncidentLocation" placeholder="Enter Incident Location / Address" onkeyup="clearError(this)"></textarea>
+                        }
+                        <label class="validationError" id="valTxtLocation" hidden="hidden"> </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        Victim Details
+        <span class="fa fa-plus-square pull-right" style="font-size:larger">
+            <a href="#" id="addVictim" style="color:white; cursor:pointer"> Add Victim </a>
+        </span>
+    </div>
+
+    <div class="panel-body" id="divVictimDetails">
+
+        @if (Model.IsEditMode)
+        {
+            foreach (var vict in Model.CaseDetails.VictimsDetails)
+            {
+
+                Model.SelectedComplaintType = vict.ChiefComplaint;
+
+                <div class="item">
+                    <div class="col-lg-6">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Victim Name:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="txtVictimName" placeholder="Victim Name" onkeyup="clearError(this)" value="@vict.Name">
+                                    <label class="validationError" id="valTxtVictimName" hidden="hidden"> </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Victim Age:</label>
+                                <div class="col-sm-8">
+                                    <input type="number" maxlength="2" max="99" class="form-control" id="txtAge" placeholder="Age in years" onkeyup="clearError(this)" onkeypress="return isNumberKey(this)" value="@vict.Age">
+                                    <label class="validationError" id="valtxtAge" hidden="hidden"> </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-lg-6">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Gender:</label>
+                                <div class="col-sm-8">
+
+                                    <select class="form-control" value="@vict.Gender" selected="@vict.Gender" id="ddlGender" onkeyup="clearError(this)">
+                                        @switch (vict.Gender)
+                                        {
+                                            case "M":
+                                                <option value="">Select Gender</option>
+                                                <option value="1" selected>Male</option>
+                                                <option value="2">Female</option>
+                                                <option value="3">NA</option>
+                                                break;
+                                            case "F":
+                                                <option value="">Select Gender</option>
+                                                <option value="1">Male</option>
+                                                <option value="2" selected>Female</option>
+                                                <option value="3">NA</option>
+                                                break;
+                                            case "N":
+                                                <option value="">Select Gender</option>
+                                                <option value="1">Male</option>
+                                                <option value="2">Female</option>
+                                                <option value="3" selected>NA</option>
+                                                break;
+                                            default:
+                                                <option value="">Select Gender</option>
+                                                <option value="1">Male</option>
+                                                <option value="2">Female</option>
+                                                <option value="3">NA</option>
+                                                break;
+
+                                        }
+                                    </select>
+                                    <label class="validationError" id="valDdlGender" hidden="hidden"> </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Chief Complaint:</label>
+                                <div class="col-sm-8">
+                                    @Html.DropDownListFor(m => m.SelectedComplaintType, Model.ChiefComplaintTypes, "Select Complaint Type", new { @class = "form-control", id = "ddlChiefComplaint" })
+                                    <label class="validationError" id="valDdlComplaint" hidden="hidden"> </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-lg-12" style="padding-bottom:15px">
+                        <label class="control-label col-sm-2" style="padding-left:74px">Remarks:</label>
+                        <div class="col-sm-10" style="margin-left:-10px">
+                            <textarea class="form-control" id="txtVictimDetailRemarks" placeholder="Enter Remarks" onkeyup="clearError(this)"> @vict.Remarks</textarea>
+                            <label class="validationError" id="valtxtVictimDetailRemarks" hidden="hidden"> </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-12" hidden="hidden">
+                        <label class="form-control" id="lblVictimId" hidden="hidden">@vict.VictimId</label>
+                    </div>
+                    <div id="lnBrk">
+                        <hr style="border-style: outset; border-width: 2px;" />
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="item">
+                <div class="col-lg-6">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Victim Name:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="txtVictimName" placeholder="Victim Name" onkeyup="clearError(this)">
+                                <label class="validationError" id="valTxtVictimName" hidden="hidden"> </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Victim Age:</label>
+                            <div class="col-sm-8">
+                                <input type="number" maxlength="2" max="99" class="form-control" id="txtAge" placeholder="Age in years" onkeyup="clearError(this)" onkeypress="return isNumberKey(this)">
+                                <label class="validationError" id="valtxtAge" hidden="hidden"> </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-6">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Gender:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="ddlGender" onkeyup="clearError(this)">
+                                    <option value="">Select Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+                                    <option value="3">NA</option>
+                                </select>
+                                <label class="validationError" id="valDdlGender" hidden="hidden"> </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Chief Complaint:</label>
+                            <div class="col-sm-8">
+                                @Html.DropDownListFor(m => m.SelectedComplaintType, Model.ChiefComplaintTypes, "Select Complaint Type", new { @class = "form-control", id = "ddlChiefComplaint" })
+                                <label class="validationError" id="valDdlComplaint" hidden="hidden"> </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-12" style="padding-bottom:15px">
+                    <label class="control-label col-sm-2" style="padding-left:74px">Remarks:</label>
+                    <div class="col-sm-10" style="margin-left:-10px">
+                        <textarea class="form-control" id="txtVictimDetailRemarks" placeholder="Enter Remarks" onkeyup="clearError(this)"></textarea>
+                        <label class="validationError" id="valtxtVictimDetailRemarks" hidden="hidden"> </label>
+                    </div>
+                </div>
+                <div id="lnBrk" hidden>
+                    <hr style="border-style: outset; border-width: 2px;" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h4 class="panel-title">Case Closure Details</h4>
+    </div>
+    <div class="panel-body">
+        <div class="col-lg-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-6">Standard Remark:</label>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditMode)
+                        {
+                            @Html.DropDownListFor(m => m.SelectedRemark, Model.StandardRemarks, "Select Remarks", new { @class = "form-control", id = "ddlStandardRemark" })
+                        }
+                        else
+                        {
+                            @Html.DropDownListFor(m => m.SelectedRemark, Model.StandardRemarks, "Select Remarks", new { @class = "form-control", id = "ddlStandardRemark" })
+                        }
+
+                        <label class="validationError" id="valDdlStandardRemark" hidden="hidden"> </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-6">Start Time:</label>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditMode)
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureStartTime" placeholder="Select Start Time" onkeyup="clearError(this)" value="@Model.CaseDetails.CaseStartTime" onchange="clearError(this)">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureStartTime" placeholder="Select Start Time" onkeyup="clearError(this)" onchange="clearError(this)">
+                        }
+                        <label class="validationError" id="valTxtCaseClosureStartTime" hidden="hidden"> </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-6">Scene Reach Time:</label>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditMode)
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureSceneReachTime" placeholder="Enter Scene Reach Time" onkeyup="clearError(this)" value="@Model.CaseDetails.SceneReachTime" onchange="clearError(this)">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureSceneReachTime" placeholder="Enter Scene Reach Time" onkeyup="clearError(this)" onchange="clearError(this)">
+                        }
+                        <label class="validationError" id="valTxtCaseClosureSceneReachTime" hidden="hidden"> </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-6">Scene Departure Time:</label>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditMode)
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureSceneDepartureTime" placeholder="Enter Scene Departure Time" onkeyup="clearError(this)" value="@Model.CaseDetails.SceneDepartureTime" onchange="clearError(this)">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureSceneDepartureTime" placeholder="Enter Scene Departure Time" onkeyup="clearError(this)" onchange="clearError(this)">
+                        }
+                        <label class="validationError" id="valTxtCaseClosureSceneDepartureTime" hidden="hidden"> </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-6">
+            <form class="form-horizontal" id="divInstituteTime" hidden="hidden">
+                <div class="form-group">
+                    <label class="control-label col-sm-6">Institute Reach Time:</label>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditMode)
+                        {
+                        <input type="text" class="form-control" id="txtCaseClosureInstituteReachTime" placeholder="Institute Reach Time" onkeyup="clearError(this)" value="@Model.CaseDetails.InstituteReachTime" onchange="clearError(this)">
+                        }
+                        else
+                        {
+                        <input type="text" class="form-control" id="txtCaseClosureInstituteReachTime" placeholder="Institute Reach Time" onkeyup="clearError(this)" onchange="clearError(this)">
+                        }
+                        <label class="validationError" id="valTxtCaseClosureInstituteReachTime" hidden="hidden"> </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-6">Hospital Handover Time:</label>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditMode)
+                        {
+                        <input type="text" class="form-control" id="txtCaseClosureHospitalHandOverTime" placeholder="Hospital Handover Time" onkeyup="clearError(this)" value="@Model.CaseDetails.HospitalHandOverTime" onchange="clearError(this)">
+                        }
+                        else
+                        {
+                        <input type="text" class="form-control" id="txtCaseClosureHospitalHandOverTime" placeholder="Hospital Handover Time" onkeyup="clearError(this)" onchange="clearError(this)">
+                        }
+                        <label class="validationError" id="valTxtCaseClosureHospitalHandOverTime" hidden="hidden"> </label>
+                    </div>
+                </div>
+            </form>
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-sm-6">Back to Base Time:</label>
+                    <div class="col-sm-6">
+                        @if (Model.IsEditMode)
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureBackToBaseTime" placeholder="Back To Base Time" onkeyup="clearError(this)" value="@Model.CaseDetails.BackToBaseTime" onchange="clearError(this)">
+                        }
+                        else
+                        {
+                            <input type="text" class="form-control" id="txtCaseClosureBackToBaseTime" placeholder="Back To Base Time" onkeyup="clearError(this)" onchange="clearError(this)">
+                        }
+                        <label class="validationError" id="valTxtCaseClosureBackToBaseTime" hidden="hidden"> </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="panel-info">
+        <div class="panel-heading">
+            Odometer Readings
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-6">Base Start Odo:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="txtCaseClosureStartOdoReading" placeholder="Enter Start Odo reading" onkeyup="clearError(this)" value="@Model.CaseDetails.StartOdo">
+                            <label class="validationError" id="valTxtCaseClosureStartOdo" hidden="hidden"> </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-6">Scene Reach Odo:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="txtCaseClosureSceneReachOdoReading" placeholder="Enter Scene Reach Odo Reading" onkeyup="clearError(this)" value="@Model.CaseDetails.SceneReachOdo">
+                            <label class="validationError" id="valTxtCaseClosureSceneReachOdo" hidden="hidden"> </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <form class="form-horizontal">
+                    <div class="form-group" id="divInstituteOdoMeter">
+                        <label class="control-label col-sm-6">Institute Odo:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="txtCaseClosureInstituteOdoReading" placeholder="Enter Institute Start Odo reading" onkeyup="clearError(this)" value="@Model.CaseDetails.InstituteReachOdo">
+                            <label class="validationError" id="valTxtCaseClosureInstituteOdo" hidden="hidden"> </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-6">Base Reach Odo:</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="txtCaseClosureBaseReachOdoReading" placeholder="Enter Institute Reach Odo Reading" onkeyup="clearError(this)" value="@Model.CaseDetails.BackToBaseOdo">
+                            <label class="validationError" id="valTxtCaseClosureInstituteReachOdo" hidden="hidden"> </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div style="padding-bottom:45px">
+            <div class="col-lg-3"></div>
+            <div class="col-lg-3">
+                <button class="col-lg-6 btn btn-info btn-block pull-right" value="Save" id="btnSaveDetails"> Save</button>
+            </div>
+            <div class="col-lg-3">
+                <button class="col-lg-6 btn btn-success btn-block pull-left" value="Case Close" id="btnCaseClose">Case Close</button>
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/jquery.datetimepicker.js"></script>
+<script>
+    $(document).ready(function () {
+
+    });
+    $('#txtCaseClosureStartTime').datetimepicker({
+        step: 15,
+        format: 'Y-m-d H:i',
+    });
+    $('#txtCaseClosureSceneReachTime').datetimepicker({
+        datepicker: true,
+        step: 15,
+        scrollTime: true,
+        format: 'Y-m-d H:i',
+    });
+    $('#txtCaseClosureSceneDepartureTime').datetimepicker({
+        datepicker: true,
+        step: 15,
+        scrollTime: true,
+        format: 'Y-m-d H:i',
+    });
+    $('#txtCaseClosureInstituteReachTime').datetimepicker({
+        datepicker: true,
+        step: 15,
+        scrollTime: true,
+        format: 'Y-m-d H:i',
+    });
+    $('#txtCaseClosureHospitalHandOverTime').datetimepicker({
+        datepicker: true,
+        step: 15,
+        scrollTime: true,
+        format: 'Y-m-d H:i',
+    });
+    $('#txtCaseClosureBackToBaseTime').datetimepicker({
+        datepicker: true,
+        step: 15,
+        scrollTime: true,
+        format: 'Y-m-d H:i',
+    });
+
+    $("#ddlStandardRemark").change(function () {
+        //if ($("#ddlStandardRemark option:selected").text().split('-')[1] == "False")
+        if ($("#ddlStandardRemark").val().split('-')[1] == "True") {
+            $("#divInstituteTime").show();
+            $("#divInstituteOdoMeter").show();
+        } else {
+            $("#divInstituteTime").hide();
+            $("#divInstituteOdoMeter").hide();
+        }
+    });
+
+    $("#addVictim").click(function (e) {
+        e.preventDefault();
+        var template = $("#divVictimDetails").find(".item").first();
+        template.find("#lnBrk").show();
+        var newRow = template.clone();
+        newRow.find("input.form-control").val("");
+        newRow.find("textarea.form-control").val("");
+        newRow.find("label.form-control").val("");
+        newRow.find("label.form-control").text("");
+        newRow.find("select.form-control").val("");
+        $("#divVictimDetails").append(newRow);
+
+    });
+
+    $("#btnCaseClose").click(function () {
+
+        var rows = [];
+        var items = $(".item");
+        $.each(items, function (i, item) {
+            var name = $(item).find("input[id='txtVictimName']").val();
+            var age = $(item).find("input[id='txtAge']").val();
+            var gender = $(item).find("select[id='ddlGender']").val();
+            var chiefComplaint = $(item).find("select[id='ddlChiefComplaint']").val();
+            var remarks = $(item).find("textarea[id='txtVictimDetailRemarks']").val();
+            var victId = $(item).find("label[id='lblVictimId']").text();
+            var row = { Name: name, Age: age, Gender: gender, ChiefComplaint: chiefComplaint, Remarks: remarks, VictimId: victId };
+            rows.push(row);
+        });
+
+        var caseDetails = {
+            CallId: $('#lblCallId').text().split(': ')[1].trim(),
+            CallTime: $('#lblCallTime').text().split(': ')[1],
+            CallType: $("#ddlCallType").val(),
+            ContactNumber: $("#txtContactNumber").val(),
+            CallerName: $("#txtCallerName").val(),
+            IncidentLocation: $("#txtIncidentLocation").val(),
+            StandardRemark: $('#ddlStandardRemark').val().split('-')[0],
+            IsDestinationRequired: $('#ddlStandardRemark').val().split('-')[1],
+            StartOdo: $("#txtCaseClosureStartOdoReading").val(),
+            SceneReachOdo: $("#txtCaseClosureSceneReachOdoReading").val(),
+            InstituteReachOdo: $("#txtCaseClosureInstituteOdoReading").val(),
+            BackToBaseOdo: $("#txtCaseClosureBaseReachOdoReading").val(),
+            CaseStartTime: $("#txtCaseClosureStartTime").val(),
+            SceneReachTime: $("#txtCaseClosureSceneReachTime").val(),
+            SceneDepartureTime: $("#txtCaseClosureSceneDepartureTime").val(),
+            InstituteReachTime: $("#txtCaseClosureInstituteReachTime").val(),
+            HospitalHandOverTime: $("#txtCaseClosureHospitalHandOverTime").val(),
+            BackToBaseTime: $("#txtCaseClosureBackToBaseTime").val(),
+            VehicleDetails: {
+                VehicleId: $('#lblVehicleId').text(),
+                VehicleNumber: $('#lblVehicleNumber').text().split(': ')[1],
+                State: $('#lblVehicleLocation').text().split(': ')[1]
+            },
+            VictimsDetails: rows,
+        }
+
+        if (validateDetails() == true && validateDifferences() == true) {
+            $.ajax({
+                type: "POST",
+                //contentType: "application/json; charset=utf-8",
+                datatype: 'json',
+                data: caseDetails,
+                url: "@Url.Action("CloseCase", "Incident")",
+                success: function (data) {
+                    if (data.success == true)
+                        alert('Case has been closed');
+                    else {
+                        alert('Some error has occured');
+                    }
+
+                    $(location).attr('href', '@Url.Action("Index", "Home")');
+                },
+            });
+        }
+        else {
+            alert("Please check validations");
+        }
+    });
+
+    $("#btnSaveDetails").click(function () {
+        var rows = [];
+        var items = $(".item");
+        $.each(items, function (i, item) {
+            var name = $(item).find("input[id='txtVictimName']").val();
+            var age = $(item).find("input[id='txtAge']").val();
+            var gender = $(item).find("select[id='ddlGender']").val();
+            var chiefComplaint = $(item).find("select[id='ddlChiefComplaint']").val();
+            var remarks = $(item).find("textarea[id='txtVictimDetailRemarks']").val();
+            var victId = $(item).find("label[id='lblVictimId']").text();
+            var row = { Name: name, Age: age, Gender: gender, ChiefComplaint: chiefComplaint, Remarks: remarks, VictimId: victId };
+            rows.push(row);
+        });
+
+        var caseDetails = {
+            CallId: $('#lblCallId').text().split(': ')[1].trim(),
+            CallTime: $('#lblCallTime').text().split(': ')[1],
+            CallType: $("#ddlCallType").val(),
+            ContactNumber: $("#txtContactNumber").val(),
+            CallerName: $("#txtCallerName").val(),
+            IncidentLocation: $("#txtIncidentLocation").val(),
+            StandardRemark: $('#ddlStandardRemark').val().split('-')[0],
+            IsDestinationRequired: $('#ddlStandardRemark').val().split('-')[1],
+            StartOdo: $("#txtCaseClosureStartOdoReading").val(),
+            SceneReachOdo: $("#txtCaseClosureSceneReachOdoReading").val(),
+            InstituteReachOdo: $("#txtCaseClosureInstituteOdoReading").val(),
+            BackToBaseOdo: $("#txtCaseClosureBaseReachOdoReading").val(),
+            CaseStartTime: $("#txtCaseClosureStartTime").val(),
+            SceneReachTime: $("#txtCaseClosureSceneReachTime").val(),
+            SceneDepartureTime: $("#txtCaseClosureSceneDepartureTime").val(),
+            InstituteReachTime: $("#txtCaseClosureInstituteReachTime").val(),
+            HospitalHandOverTime: $("#txtCaseClosureHospitalHandOverTime").val(),
+            BackToBaseTime: $("#txtCaseClosureBackToBaseTime").val(),
+            VehicleDetails: {
+                VehicleId: $('#lblVehicleId').text(),
+                VehicleNumber: $('#lblVehicleNumber').text().split(': ')[1],
+                State: $('#lblVehicleLocation').text().split(': ')[1]
+            },
+            VictimsDetails: rows,
+        }
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            datatype: 'json',
+            data: JSON.stringify(caseDetails),
+            url: "@Url.Action("SaveCase", "Incident")",
+            success: function (data) {
+                if (data.success == true)
+                    alert('Details Saved succesfully');
+                else if (data.success == false) {
+                    alert('Some error occured');
+                }
+            },
+        });
+    });
+
+    function validateDetails() {
+        var isValid = true;
+
+        if ($("#ddlCallType").val() == "") {
+            $("#valDdlCallType").text("*Select Call Type").show();
+            isValid = false;
+        }
+        if ($("#txtCallerName").val() == "") {
+            $("#valTxtCallName").text("*Required Field").show();
+            isValid = false;
+        }
+        if ($("#txtContactNumber").val() == "" || $("#txtContactNumber").val().length != 10) {
+            $("#valContactNumber").text("*Required Field").show();
+            if ($("#txtContactNumber").val().length < 10) {
+                $("#valContactNumber").text("*Enter valid phone number").show();
+            }
+            isValid = false;
+        }
+        if ($("#txtIncidentLocation").val() == "") {
+            $("#valTxtLocation").text("*Required Field").show();
+            isValid = false;
+        }
+
+        if ($("#txtVictimName").val() == "") {
+            $("#valTxtVictimName").text("*Required Field").show();
+            isValid = false;
+        }
+        if ($("#ddlGender").val() == "") {
+            $("#valDdlGender").text("*Select Gender").show();
+            isValid = false;
+        }
+        if ($("#txtAge").val() == "" || $("#txtAge").val().length > 2) {
+            $("#valtxtAge").text("*Enter Valid Age").show();
+            isValid = false;
+        }
+        if ($("#ddlChiefComplaint").val() == "") {
+            $("#valDdlComplaint").text("*Select a chief complaint").show();
+            isValid = false;
+        }
+        if ($("#txtVictimDetailRemarks").val() == "") {
+            $("#valtxtVictimDetailRemarks").text("*Required Field").show();
+            isValid = false;
+        }
+
+        if ($("#ddlStandardRemark").val() == "") {
+            $("#valDdlStandardRemark").text("*Select a Standard Remark").show();
+            isValid = false;
+        }
+
+        if ($("#txtCaseClosureStartOdoReading").val() == "") {
+            $("#valTxtCaseClosureStartOdo").text("*Required Field").show();
+            isValid = false;
+        }
+        if ($("#txtCaseClosureSceneReachOdoReading").val() == "") {
+            $("#valTxtCaseClosureSceneReachOdo").text("*Required Field").show();
+            isValid = false;
+        }
+        if ($("#ddlStandardRemark").val().split('-')[1] == "True") {
+            if ($("#txtCaseClosureInstituteOdoReading").val() == "") {
+                $("#valTxtCaseClosureInstituteOdo").text("*Required Field").show();
+                isValid = false;
+            }
+            if ($("#txtCaseClosureBaseReachOdoReading").val() == "") {
+                $("#valTxtCaseClosureInstituteReachOdo").text("*Required Field").show();
+                isValid = false;
+            }
+
+            if ($("#txtCaseClosureInstituteReachTime").val() == "") {
+                $("#valTxtCaseClosureInstituteReachTime").text("*Required Field").show();
+                isValid = false;
+            }
+            if ($("#txtCaseClosureHospitalHandOverTime").val() == "") {
+                $("#valTxtCaseClosureHospitalHandOverTime").text("*Required Field").show();
+                isValid = false;
+            }
+            if ($("#txtCaseClosureBackToBaseTime").val() == "") {
+                $("#valTxtCaseClosureBackToBaseTime").text("*Required Field").show();
+                isValid = false;
+            }
+        }
+
+        if ($("#txtCaseClosureStartTime").val() == "") {
+            $("#valTxtCaseClosureStartTime").text("*Required Field").show();
+            isValid = false;
+        }
+        if ($("#txtCaseClosureSceneReachTime").val() == "") {
+            $("#valTxtCaseClosureSceneReachTime").text("*Required Field").show();
+            isValid = false;
+        }
+        if ($("#txtCaseClosureSceneDepartureTime").val() == "") {
+            $("#valTxtCaseClosureSceneDepartureTime").text("*Required Field").show();
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function validateDifferences() {
+        var isValidTime = true;
+        var caseStartToSceneReachDifference = timeDifference($("#txtCaseClosureStartTime").val(), $("#txtCaseClosureSceneReachTime").val());
+        var sceneDepartureToSceneReachDifference = timeDifference($("#txtCaseClosureSceneReachTime").val(), $("#txtCaseClosureSceneDepartureTime").val());
+        var backToBaseToSceneDepartureDifference = timeDifference($("#txtCaseClosureSceneDepartureTime").val(), $("#txtCaseClosureBackToBaseTime").val());
+        var sceneReachToStartOdoDifference = $("#txtCaseClosureSceneReachOdoReading").val() - $("#txtCaseClosureStartOdoReading").val()
+
+        if (caseStartToSceneReachDifference < 0) {
+            $("#valTxtCaseClosureSceneReachTime").text("*Time cannot be less than Start time").show();
+            return isValidTime = false;
+        }
+        if (caseStartToSceneReachDifference > 2) {
+            alert("Scene reach time cannot be more than 120 minutes of start time")
+            return isValidTime = false;
+        }
+
+        if (sceneDepartureToSceneReachDifference < 0) {
+            $("#valTxtCaseClosureSceneReachTime").text("*Time cannot be more than scene departutre time").show();
+            return isValidTime = false;
+        }
+        if (sceneDepartureToSceneReachDifference > 2) {
+            alert("Scene departure time cannot be more than 120 minutes of scene reach time");
+            return isValidTime = false;
+        }
+
+        if (sceneReachToStartOdoDifference < 0) {
+            $("#valTxtCaseClosureStartOdo").text("*Scene reach odo must be greater than scene start odo").show();
+            return isValidTime = false;
+        }
+        if (sceneReachToStartOdoDifference > 100) {
+            alert("scene reach odo reading cannot be greater than 100km from start odo");
+            return isValidTime = false;
+        }
+
+        if ($("#ddlStandardRemark").val().split('-')[1] == "True") {
+
+            var instituteReachToSceneDepartureDifference = timeDifference($("#txtCaseClosureSceneDepartureTime").val(), $("#txtCaseClosureInstituteReachTime").val());
+            var instituteDepartureToInstituteReachDifference = timeDifference($("#txtCaseClosureInstituteReachTime").val(), $("#txtCaseClosureHospitalHandOverTime").val());
+            var backToBaseToInstituteDepartureDifference = timeDifference($("#txtCaseClosureHospitalHandOverTime").val(), $("#txtCaseClosureBackToBaseTime").val());
+
+            if (instituteReachToSceneDepartureDifference < 0) {
+                $("#valTxtCaseClosureSceneReachTime").text("*Time cannot be more than institute reach time").show();
+                return isValidTime = false;
+            }
+            if (instituteReachToSceneDepartureDifference > 2) {
+                alert("institute reach time cannot be more than 120 minutes of scene departure time");
+                return isValidTime = false;
+            }
+            if (instituteDepartureToInstituteReachDifference < 0) {
+                $("#valTxtCaseClosureSceneReachTime").text("*Time cannot be more than institute departure time").show();
+                return isValidTime = false;
+            }
+            if (instituteDepartureToInstituteReachDifference > 2) {
+                alert("Institute departure time cannot be more than 120 minutes of institute time");
+                return isValidTime = false;
+            }
+            if (backToBaseToInstituteDepartureDifference < 0) {
+                $("#valTxtCaseClosureBackToBaseTime").text("*Time cannot be more than institute departure time").show();
+                return isValidTime = false;
+            }
+            if (backToBaseToInstituteDepartureDifference > 2) {
+                alert("Back to Base time cannot be more than 120 minutes of institute departure time");
+                return isValidTime = false;
+            }
+
+            var instituteReachOdoToSceneDepartureOdoDiff = $("#txtCaseClosureInstituteOdoReading").val() - $("#txtCaseClosureSceneReachOdoReading").val()
+            var baseReachOdoToInstituteReachOdoDiff = $("#txtCaseClosureBaseReachOdoReading").val() - $("#txtCaseClosureInstituteOdoReading").val()
+
+            if (instituteReachOdoToSceneDepartureOdoDiff < 0) {
+                $("#valTxtCaseClosureInstituteOdo").text("*Institute reach odo must be greater than scene departure odo").show();
+                return isValidTime = false;
+            }
+            if (instituteReachOdoToSceneDepartureOdoDiff > 100) {
+                alert("cannot be more than 100km");
+                return isValidTime = false;
+            }
+
+            if (baseReachOdoToInstituteReachOdoDiff < 0) {
+                $("#valTxtCaseClosureInstituteOdo").text("*base reach odo must be greater than institute departure odo").show();
+                return isValidTime = false;
+            }
+            if (baseReachOdoToInstituteReachOdoDiff > 100) {
+                alert("cannot be more than 100km");
+                return isValidTime = false;
+            }
+        }
+        else {
+            if (backToBaseToSceneDepartureDifference < 0) {
+                $("#valTxtCaseClosureBackToBaseTime").text("*Time cannot be less than scene departure time").show();
+                return isValidTime = false;
+            }
+            if (backToBaseToSceneDepartureDifference > 2) {
+                alert("Back to base time cannot be more than 120 minutes of scene departure time")
+                return isValidTime = false;
+            }
+        }
+
+        return isValidTime;
+    }
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    function timeDifference(startTime, endTime) {
+        //var difference = (new Date(endTime).getTime() - new Date(startTime).getTime()) / 1000;
+        //difference = difference / 60;
+        ////return Math.abs(Math.round(difference));
+        //return Math.round(difference);
+
+        var difference = (parseInt(new Date(endTime).getTime() / 1000) - parseInt(new Date(startTime).getTime() / 1000)) / 3600;
+        return difference;
+    }
+
+    $("#ddlCallType").change(function () {
+        $("#valDdlCallType").hide();
+    });
+    $("#ddlGender").change(function () {
+        $("#valDdlGender").hide();
+    });
+    $("#ddlChiefComplaint").change(function () {
+        $("#valDdlComplaint").hide();
+    });
+    $("#ddlStandardRemark").change(function () {
+        $("#valDdlStandardRemark").hide();
+    });
+
+
+    function clearError(event) {
+        if ($(event).val() == '') {
+            $(event).parent().find("label").text("*Required").show();
+        }
+        else {
+            $(event).parent().find("label").hide();
+        }
+    }
+
+
+</script>

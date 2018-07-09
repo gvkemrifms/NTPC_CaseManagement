@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewBag.Title = "PendingCases";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model NTPC.Models.PendingCaseVM
+<h2>PendingCases</h2>
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <div class="panel-title">Pending Cases for Vehicle No: @Model.VehicleNumber</div>
+    </div>
+    <div class="panel-body table-responsive">
+        <div class="table-responsive">
+            @if (Model.PendingCases.Count <= 0)
+            {
+                <div class="info">
+                    <strong>No pending cases for the selected vehicle number</strong>
+                </div>
+            }
+            else
+            {
+                <table id="tblPendingCases" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center;">Call Id</th>
+                            <th style="text-align:center;">Call Time</th>
+                            <th style="text-align:center;">Caller Name</th>
+                            <th style="text-align:center;">Contact Number</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblBdyPendingCases">
+                        @foreach(var pendingCase in Model.PendingCases)
+                        {
+                            <tr>
+                                <td style="text-align:center;"><a href="@Url.Action("EditCaseIncident","Incident",new{ callId=pendingCase.CallId })">@pendingCase.CallId</a></td>
+                                <td style="text-align:center;">@pendingCase.CallTime</td>
+                                <td style="text-align:center;">@pendingCase.CallerName</td>
+                                <td style="text-align:center;">@pendingCase.ContactNumber</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.ajaxSetup({ cache: false });
+
+
+    });
+
+    $("#tblPendingCases").DataTable({
+        responsive: true,
+        "pageLength": 5000,
+        fixedHeader: true,
+        "pagingType": "simple_numbers",
+        "columnDefs": [
+            {
+                "targets": 0,
+                'searchable': true,
+                'orderable': true,
+            }]
+    });
+</script>
+

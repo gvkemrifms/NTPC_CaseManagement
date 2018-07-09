@@ -1,0 +1,5 @@
+E:\Project\NTPC\NTPC.Models\bin\Debug\NTPC.Models.dll
+E:\Project\NTPC\NTPC.Models\bin\Debug\NTPC.Models.pdb
+E:\Project\NTPC\NTPC.Models\obj\Debug\NTPC.Models.csprojResolveAssemblyReference.cache
+E:\Project\NTPC\NTPC.Models\obj\Debug\NTPC.Models.dll
+E:\Project\NTPC\NTPC.Models\obj\Debug\NTPC.Models.pdb

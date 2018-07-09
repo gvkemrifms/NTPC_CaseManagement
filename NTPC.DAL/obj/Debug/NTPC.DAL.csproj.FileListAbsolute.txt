@@ -1,0 +1,7 @@
+E:\Project\NTPC\NTPC.DAL\bin\Debug\NTPC.DAL.dll
+E:\Project\NTPC\NTPC.DAL\bin\Debug\NTPC.DAL.pdb
+E:\Project\NTPC\NTPC.DAL\bin\Debug\NTPC.Models.dll
+E:\Project\NTPC\NTPC.DAL\bin\Debug\NTPC.Models.pdb
+E:\Project\NTPC\NTPC.DAL\obj\Debug\NTPC.DAL.csprojResolveAssemblyReference.cache
+E:\Project\NTPC\NTPC.DAL\obj\Debug\NTPC.DAL.dll
+E:\Project\NTPC\NTPC.DAL\obj\Debug\NTPC.DAL.pdb
